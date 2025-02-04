@@ -1,38 +1,42 @@
-name: run main.py
+name: Run main.py every 2 minutes
 
 on:
   schedule:
     - cron: '*/2 * * * *'  # Läuft alle 2 Minuten
+  workflow_dispatch:  # Manuelles Starten erlaubt
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-      - name: checkout repo content
-        uses: actions/checkout@v2 # checkout the repository content to github runner
-
-      - name: setup python
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9' # install the python version needed
-          
-      - name: install python packages
+          python-version: '3.9'
+
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          
-      
 
-      - name: commit files
+      - name: Execute Python Script
+        env:
+          SOME_SECRET: ${{ secrets.SOME_SECRET }}
+        run: python main.py
+
+      - name: Commit Changes (falls Logs oder Daten geändert wurden)
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A
-          
-          
-      - name: push changes
+          git diff-index --quiet HEAD || (git commit -m "Automated update via GitHub Actions" --allow-empty)
+
+      - name: Push Changes
         uses: ad-m/github-push-action@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main 
+          branch: main
