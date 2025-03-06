@@ -16,5 +16,5 @@ nachricht =(f"NASDAQ-100: {aktueller_kurs} USD\n"
 
 main.emailsenden(f'"{nachricht}"')
 print("NASDAQ-Bericht gesendet!")
-
+print("Das wird doch ne Einz oder?")
 
